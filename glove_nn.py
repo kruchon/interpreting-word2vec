@@ -81,7 +81,7 @@ def macro_vertex(macro_vertex_label, round=None):
                 MATCH (cluster:Cluster {id: $clusterId, round: $round })-[:CONTAINS]->(token)
                 WITH cluster, collect(token) AS tokens
                 UNWIND tokens AS t1 UNWIND tokens AS t2 WITH t1, t2, cluster WHERE t1 <> t2
-                WITH t1, cluster, reduce(acc = 0, t2 in collect(t2) | acc + apoc.algo.euclideanDistance(t1.embedding, t2.embedding)) AS distance
+                WITH t1, cluster, reduce(acc = 0.0, t2 in collect(t2) | acc + apoc.algo.euclideanDistance(t1.embedding, t2.embedding)) AS distance
                 WITH t1, cluster, distance ORDER BY distance LIMIT 1
                 SET cluster.centre = t1.id
                 WITH t1
