@@ -76,8 +76,8 @@ def macro_vertex(macro_vertex_label, round=None):
 
         for row in result:
             cluster_id = row["cluster"]["id"]
-
-            session.run("""\
+            tx = session.begin_transaction()
+            tx.run("""\
                 MATCH (cluster:Cluster {id: $clusterId, round: $round })-[:CONTAINS]->(token)
                 WITH cluster, collect(token) AS tokens
                 UNWIND tokens AS t1 UNWIND tokens AS t2 WITH t1, t2, cluster WHERE t1 <> t2
@@ -88,7 +88,8 @@ def macro_vertex(macro_vertex_label, round=None):
                 CALL apoc.create.addLabels(t1, [$newLabel]) YIELD node
                 RETURN node
                 """, {"clusterId": cluster_id, "round": round, "newLabel": macro_vertex_label})
-
+            tx.success = True
+            tx.close()
 
 round = 0
 cluster_label = "Cluster"
